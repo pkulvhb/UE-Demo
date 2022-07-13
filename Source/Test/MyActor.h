@@ -26,4 +26,22 @@ public:
 	/** Event when this actor is clicked by the mouse when using the clickable interface. */
 	virtual void NotifyActorOnClicked(FKey ButtonPressed = EKeys::LeftMouseButton) override;
 
+	// Event when this actor has the mouse moved over it with the clickable interface.
+	virtual void NotifyActorBeginCursorOver() override;
+
+	// Event when this actor has the mouse moved off of it with the clickable interface.
+	virtual void NotifyActorEndCursorOver() override;
+
+private:
+	UPROPERTY()
+		float DoubleClickTestPadding = 0.3f;
+
+	UPROPERTY()
+		float LastClickTime = 0;
+
+	UPROPERTY()
+		bool IsInDoubleClickTest = false;
+
+	void OnDoubleClick();
+
 };

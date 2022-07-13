@@ -15,7 +15,8 @@ ATestPlayerController::ATestPlayerController()
 void ATestPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	bEnableClickEvents = true;
+	bEnableClickEvents = true; //打开监听点击事件的开关
+	bEnableMouseOverEvents = true; //打开监听鼠标悬停事件的开关
 }
 
 // Called every frame
