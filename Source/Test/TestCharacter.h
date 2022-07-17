@@ -18,8 +18,15 @@ class ATestCharacter : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+
+	// Show the information on the character's head
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Info, meta = (AllowPrivateAccess = "true"))
+	class UWidgetComponent* InfoWidgetComponent;
+
 public:
 	ATestCharacter();
+
+	virtual void BeginPlay() override;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
@@ -29,10 +36,22 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Info)
+	float TotalLife;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Info)
+	float CurLife;
+
 protected:
 
 	/** Resets HMD orientation in VR. */
 	void OnResetVR();
+	
+	UFUNCTION()
+	void FireBloodSkill();
+
+	UFUNCTION(BlueprintCallable)
+	void RefreshHeadInfo();
 
 	/** Called for forwards/backward input */
 	void MoveForward(float Value);

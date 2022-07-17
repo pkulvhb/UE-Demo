@@ -5,6 +5,8 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
+#include "Components/WidgetComponent.h"
+#include "Components/ProgressBar.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -20,6 +22,8 @@ ATestCharacter::ATestCharacter()
 	// set our turn rates for input
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
+	TotalLife = 120;
+	CurLife = 120;
 
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
@@ -43,8 +47,26 @@ ATestCharacter::ATestCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	InfoWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("InfoWidgetComponent"));
+	InfoWidgetComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+
+}
+
+void ATestCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	auto InfoWidegetClass = LoadClass<UUserWidget>(NULL, TEXT("WidgetBlueprint'/Game/Test/UI/UI_HeadInfo.UI_HeadInfo_C'"));
+	InfoWidgetComponent->SetWidgetClass(InfoWidegetClass);
+	InfoWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+	InfoWidgetComponent->SetPivot(FVector2D(1, 0.5));
+	InfoWidgetComponent->SetDrawSize(FVector2D(120.0f, 10.0f));
+	InfoWidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 95.0f));
+
+	RefreshHeadInfo();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -72,8 +94,10 @@ void ATestCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 	PlayerInputComponent->BindTouch(IE_Pressed, this, &ATestCharacter::TouchStarted);
 	PlayerInputComponent->BindTouch(IE_Released, this, &ATestCharacter::TouchStopped);
 
+
 	// VR headset functionality
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ATestCharacter::OnResetVR);
+	PlayerInputComponent->BindAction("BloodSkill", IE_Released, this, &ATestCharacter::FireBloodSkill);
 }
 
 
@@ -88,14 +112,33 @@ void ATestCharacter::OnResetVR()
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
 }
 
+void ATestCharacter::FireBloodSkill()
+{
+	if (CurLife >= 20)
+		CurLife -= 10;
+	else
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("FireBloodSkill fail, life is low!"));
+	RefreshHeadInfo();
+}
+
+void ATestCharacter::RefreshHeadInfo()
+{
+	UUserWidget* InfoWidget = InfoWidgetComponent->GetUserWidgetObject();
+	if (InfoWidget) {
+		auto ProgressBar = Cast<UProgressBar>(InfoWidget->GetWidgetFromName(TEXT("PB_Life")));
+		if (ProgressBar)
+			ProgressBar->SetPercent(CurLife / TotalLife);
+	}
+}
+
 void ATestCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
 {
-		Jump();
+	Jump();
 }
 
 void ATestCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
 {
-		StopJumping();
+	StopJumping();
 }
 
 void ATestCharacter::TurnAtRate(float Rate)
@@ -126,12 +169,12 @@ void ATestCharacter::MoveForward(float Value)
 
 void ATestCharacter::MoveRight(float Value)
 {
-	if ( (Controller != nullptr) && (Value != 0.0f) )
+	if ((Controller != nullptr) && (Value != 0.0f))
 	{
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
-	
+
 		// get right vector 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
