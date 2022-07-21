@@ -3,6 +3,7 @@
 #include "TestGameMode.h"
 #include "TestCharacter.h"
 #include "UObject/ConstructorHelpers.h"
+#include "manager/PawnManager.h"
 
 ATestGameMode::ATestGameMode()
 {
@@ -12,4 +13,10 @@ ATestGameMode::ATestGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+}
+
+void ATestGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+	PawnManager = GetWorld()->SpawnActor<APawnManager>();
 }

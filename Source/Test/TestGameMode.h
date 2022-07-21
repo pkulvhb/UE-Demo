@@ -13,6 +13,11 @@ class ATestGameMode : public AGameModeBase
 
 public:
 	ATestGameMode();
+
+	virtual void BeginPlay() override;
+
+	UPROPERTY()
+		class APawnManager* PawnManager;
 };
 
 
