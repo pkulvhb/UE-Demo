@@ -2,6 +2,7 @@
 
 
 #include "MyActor.h"
+#include "TestCharacter.h"
 
 // Sets default values
 AMyActor::AMyActor()
@@ -21,7 +22,6 @@ void AMyActor::BeginPlay()
 void AMyActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 
@@ -62,4 +62,22 @@ void AMyActor::NotifyActorBeginCursorOver()
 void AMyActor::NotifyActorEndCursorOver()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("EndCursorOver"));
+}
+
+void AMyActor::NotifyActorBeginOverlap(AActor* OtherActor)
+{
+	auto Character = Cast<ATestCharacter>(OtherActor);
+	if (Character != nullptr)
+	{
+		SetActorHiddenInGame(true);
+	}
+}
+
+void AMyActor::NotifyActorEndOverlap(AActor* OtherActor)
+{
+	auto Character = Cast<ATestCharacter>(OtherActor);
+	if (Character != nullptr)
+	{
+		SetActorHiddenInGame(false);
+	}
 }

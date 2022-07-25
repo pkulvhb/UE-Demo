@@ -9,6 +9,6 @@ public class Test : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		PublicDependencyModuleNames.AddRange(new string[] {
-			"Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "UMG","JsonUtilities", "Json" });
+			"Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "UMG","JsonUtilities", "Json"});
 	}
 }

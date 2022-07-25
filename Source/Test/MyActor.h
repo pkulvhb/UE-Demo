@@ -32,6 +32,19 @@ public:
 	// Event when this actor has the mouse moved off of it with the clickable interface.
 	virtual void NotifyActorEndCursorOver() override;
 
+	/**
+	 *	Event when this actor overlaps another actor, for example a player walking into a trigger.
+	 *	For events when objects have a blocking collision, for example a player hitting a wall, see 'Hit' events.
+	 *	@note Components on both this and the other Actor must have bGenerateOverlapEvents set to true to generate overlap events.
+	 */
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
+
+	/**
+	 *	Event when an actor no longer overlaps another actor, and they have separated.
+	 *	@note Components on both this and the other Actor must have bGenerateOverlapEvents set to true to generate overlap events.
+	 */
+	virtual void NotifyActorEndOverlap(AActor* OtherActor) override;
+
 private:
 	UPROPERTY()
 		float DoubleClickTestPadding = 0.3f;
